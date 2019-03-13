@@ -7,11 +7,11 @@ LIBS          = -lm
 OBJS          = lcg.o 
 PROGRAM       = lcg
 
-all:$(PROGRAM)
+all:		$(PROGRAM)
 
-$(PROGRAM):$(OBJS)
-	$(CXX) $(OBJS) $(LDFLAGS) $(LIBS) -o $(PROGRAM)
-	chmod 755 $(PROGRAM)
+$(PROGRAM):	$(OBJS)
+		$(CC) $(OBJS) $(LDFLAGS) $(LIBS) -o $(PROGRAM)
+		chmod 755 $(PROGRAM)
 
 clean:
-	rm -f *.o *~ $(PROGRAM)
+		rm -f *.o *~ $(PROGRAM)
