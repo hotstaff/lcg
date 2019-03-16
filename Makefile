@@ -1,10 +1,9 @@
 CC            = gcc
-CXX           = g++
 CFLAGS        = -O2 -Wall -I/usr/local/include
-CXXFLAGS      = -Wall -I/usr/local/include
+DEST          = /usr/local/bin
 LDFLAGS       = -L/usr/local/lib
 LIBS          = -lm
-OBJS          = lcg.o 
+OBJS          = lcg.o main.o
 PROGRAM       = lcg
 
 all:		$(PROGRAM)
@@ -15,3 +14,9 @@ $(PROGRAM):	$(OBJS)
 
 clean:
 		rm -f *.o *~ $(PROGRAM)
+
+install:	$(PROGRAM)
+		install -s $(PROGRAM) $(DEST)
+
+uninstall:	
+		rm -f $(DEST)/$(PROGRAM)

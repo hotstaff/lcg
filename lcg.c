@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 /*  
- *  lcg.c - Logistic Chaos Generator sample program
+ *  lcg.c - Logistic Chaos bit Generator
  *
  *  This program encode the binary data to its logistic map
  *  origin with initial value x0.
@@ -10,63 +10,13 @@
  * 
 */
 
-#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <limits.h>
-#include <string.h>
-#include <getopt.h>
+#include "lcg.h"
 
-#define AI 	   	           4  /*initial a, AI=4 means complete chaos*/
-#define BLOCK_SIZE 		   2  /*default block size (bytes)*/
-
-#define USE_DBL                    1  /*double or float*/
-
-#define BCD(c)	(5 * (5 * (5 * (5 * (5 * (5 * (5 * (c & 128) + (c & 64)) \
-	+ (c & 32)) + (c & 16)) + (c & 8)) + (c & 4)) + (c & 2)) + (c & 1))
-
-#if USE_DBL
-#define X_FLOAT_TYPE          double  /*x presision*/
-#define BITWISE            bitwise64  /*union bitwise*/
-#else
-#define X_FLOAT_TYPE           float 
-#define BITWISE            bitwise32
-#endif
-
-static unsigned long long int seed = 88172645463325252LL;
-
-struct double_inner {
-	unsigned long int coefficient : 52;
-	unsigned int radix : 11;
-	unsigned int sign : 1;
-};
-
-struct float_inner {
-	unsigned int coefficient : 23;
-	unsigned int radix : 8;
-	unsigned int sign : 1;
-};
-
-/**
- * union bitwise64 - View of 64bit float point number
- */
-union bitwise64 {
-	double f;
-	long long int i;
-	unsigned char c[8];
-	struct double_inner inner;		
-};
-
-/**
- * union bitwise64 - View of 64bit float point number
- */
-union bitwise32 {
-	float f;
-	long int i;
-	unsigned char c[4];
-	struct float_inner inner;
-};
+static unsigned long long int lcg_seed = 88172645463325252LL;
 
 /**
  * dump_bin() - Print bin and hex.
@@ -79,14 +29,17 @@ void dump_bin(char* title, unsigned char* byte_array,
 	      const unsigned int size)
 {
 	int i;
+
 	printf("%8s bin: ", title);
-	for (i = 0; i < size; i++) {
+	
+	for (i = 0; i < size; i++) 
 		printf("%08d ", BCD(byte_array[i]));
-	}
+
 	printf("\n%8s hex: ", title);
-	for (i = 0; i < size; i++) {
+	
+	for (i = 0; i < size; i++)
 		printf("0x%02X ", byte_array[i] & 0x000000FF);	
-	}
+	
 	printf("\n");
 }
 
@@ -97,15 +50,14 @@ void dump_bin(char* title, unsigned char* byte_array,
  * @array2:  char array
  * @size:    the length of compare
  */
-int cmp_bytes(unsigned char* array1, unsigned char* array2,
-	      unsigned int size)
+static int cmp_bytes(unsigned char* array1, unsigned char* array2,
+		     unsigned int size)
 {
 	int i;
 
 	for (i = 0; i < size; i++) {
-		if (*(array1 + i) != *(array2 + i)) {
+		if (*(array1 + i) != *(array2 + i))
 			return 0;
-		}
 	}
 	return 1;
 }
@@ -117,7 +69,7 @@ int cmp_bytes(unsigned char* array1, unsigned char* array2,
  * @array2:   target array
  * @size:     copy length
  */
-void cp_bytes(unsigned char* array1, unsigned char* array2,
+static void cp_bytes(unsigned char* array1, unsigned char* array2,
 	      unsigned int size)
 {
 	int i;
@@ -128,16 +80,15 @@ void cp_bytes(unsigned char* array1, unsigned char* array2,
 }
 
 /**
- * initilize_seed() - Initilize seed of xor64(). 
+ * lcg_init_seed() - Initilize seed of xor64(). 
  */
-void initilize_seed(void)
+void lcg_init_seed(void)
 {
 	srandom((unsigned int) time(NULL));
-	seed ^= (unsigned long long int) random();
-	seed = seed << 23;
-	seed ^= (unsigned long long int) random();
+	lcg_seed ^= (unsigned long long int) random();
+	lcg_seed = lcg_seed << 23;
+	lcg_seed ^= (unsigned long long int) random();
 }
-
 
 /**
  * xor64() - Create 64bit pseudorandom numbers using xorshift method
@@ -145,9 +96,9 @@ void initilize_seed(void)
  * Period of pseudo random number is 2^64 -1.
  *
  */
-unsigned long long xor64(void)
+static unsigned long long xor64(void)
 {
-	unsigned long long *x = &seed;
+	unsigned long long *x = &lcg_seed;
 
 	*x ^= (*x << 13);
 	*x ^= (*x >> 7);
@@ -157,7 +108,7 @@ unsigned long long xor64(void)
 /**
  * uniform_rand() - Generate a uniform random number normalized from 0 to 1.
  */
-X_FLOAT_TYPE uniform_rand(void)
+static X_FLOAT_TYPE uniform_rand(void)
 {	
 	return (
 		((X_FLOAT_TYPE) xor64() + 1.0)
@@ -168,7 +119,7 @@ X_FLOAT_TYPE uniform_rand(void)
 /**
  * logistic() - Return logistic map.
  */
-X_FLOAT_TYPE logistic(const X_FLOAT_TYPE *x)
+static X_FLOAT_TYPE logistic(const X_FLOAT_TYPE *x)
 {       
 	return AI * (*x) * (1 - (*x));
 }
@@ -179,23 +130,11 @@ X_FLOAT_TYPE logistic(const X_FLOAT_TYPE *x)
  * This function return unsigned char(0 or 1).
  * 
  */
-unsigned char degitize(const X_FLOAT_TYPE *x)
+static unsigned char degitize(const X_FLOAT_TYPE *x)
 {
-	if (*x < 0.5) {
+	if (*x < 0.5)
 		return 0;
-	}
 	return 1;
-}
-
-/**
- * degitize_char() - Digitize to 8bit.
- *
- * Cast unsigned int(0 - 255).
- */
-unsigned char digitize_char(const X_FLOAT_TYPE *x)
-{	
-	return (unsigned char)((UCHAR_MAX + 1.0) * (*x));
-
 }
 
 /**
@@ -207,7 +146,7 @@ unsigned char digitize_char(const X_FLOAT_TYPE *x)
  * This function uses digitize().
  *
  */
-void eight_bit(X_FLOAT_TYPE *x0, unsigned char *byte_array)
+static void eight_bit(X_FLOAT_TYPE *x0, unsigned char *byte_array)
 {
 	int i = CHAR_BIT; /*1byte = 8bit*/
 
@@ -231,7 +170,7 @@ void eight_bit(X_FLOAT_TYPE *x0, unsigned char *byte_array)
  *  1: success
  *  0: fail
  */
-int eight_bit_r(X_FLOAT_TYPE *x0, unsigned char *byte_array,
+static int eight_bit_r(X_FLOAT_TYPE *x0, unsigned char *byte_array,
 		const unsigned char *target_bin)
 {
 	int i = CHAR_BIT;
@@ -254,20 +193,6 @@ int eight_bit_r(X_FLOAT_TYPE *x0, unsigned char *byte_array,
 }
 
 /**
- * one_byte() - Write 8 bits from the initial value of the logistic map.
- *
- * @x0:          initial x
- * @byte_array:  output array
- *
- * This function uses digitize_char().
- */
-void one_byte(X_FLOAT_TYPE *x0, unsigned char *byte_array)
-{	
-	*x0 = logistic(x0);
-	*byte_array = digitize_char(x0);
-}
-
-/**
  * read_block() - Read bin array from file.
  * @fp:    file pointer
  * @bin:   binary array
@@ -277,7 +202,7 @@ void one_byte(X_FLOAT_TYPE *x0, unsigned char *byte_array)
  *  >=1: success(read size)
  *  0: fail
  */
-int read_block(FILE *fp, unsigned char* bin, unsigned int size)
+static int read_block(FILE *fp, unsigned char* bin, unsigned int size)
 {	
 	unsigned int l;
 	if ((l = fread(bin, sizeof(unsigned char), size, fp)) < 1)
@@ -295,7 +220,7 @@ int read_block(FILE *fp, unsigned char* bin, unsigned int size)
  *  >=1: success(wrote size)
  *  0:  fail
  */
-int write_block(FILE *fp, unsigned char* bin, unsigned int size)
+static int write_block(FILE *fp, unsigned char* bin, unsigned int size)
 {	
 	unsigned int l;
 	if ((l = fwrite(bin, sizeof(unsigned char), size, fp)) < 1)
@@ -316,7 +241,7 @@ int write_block(FILE *fp, unsigned char* bin, unsigned int size)
  *  1: success
  *  0: yet 
 */
-int encode_block(long int *counter, X_FLOAT_TYPE *x0,
+static int encode_block(unsigned long long int *counter, X_FLOAT_TYPE *x0,
 		 unsigned char *bin, unsigned char *byte_array,
 		 const int size)
 {
@@ -343,15 +268,18 @@ int encode_block(long int *counter, X_FLOAT_TYPE *x0,
 		if (j > max_j)
 			max_j = j;
 
-		if (*counter % 100 == 0)
-			printf("\rtry %17ld bytes, match: %4d", 
+		if (*counter % 1000 == 0) {
+			/*change random seed by random timing*/
+			lcg_init_seed();
+			printf("\rtry %19llu bytes, match: %4d", 
 			       *counter, max_j + 1);
+		}
 
 		if (
 			j == size - 1
 			&& cmp_bytes(&bin[0], &byte_array[0], size)
 		) {	
-			printf("\rhit %17ld bytes, match: %4d\n", 
+			printf("\rhit %19llu bytes, match: %4d\n", 
 			       *counter, max_j + 1);	
 			return 1;
 		}
@@ -369,7 +297,8 @@ int encode_block(long int *counter, X_FLOAT_TYPE *x0,
  *  1: success
  *  0: yet
  */
-int encode(FILE *fp_in, FILE *fp_out, const unsigned int block_size)
+int lcg_encode(FILE *fp_in, FILE *fp_out, const unsigned int block_size,
+	       struct lcg_operation_result *result)
 {	
 	const int sizeof_x = sizeof(X_FLOAT_TYPE);
 
@@ -381,10 +310,15 @@ int encode(FILE *fp_in, FILE *fp_out, const unsigned int block_size)
 	union BITWISE bitview;
 
 	X_FLOAT_TYPE x0;
-	long int i;
-	int block_no = 0;
+
+	unsigned long long int i;
+	unsigned long block_count = 0;
 
 	unsigned int read_length;
+	unsigned int last_length = block_size;
+	
+	result->count = 0;
+
 	while((read_length = read_block(fp_in, &bin[0], block_size))) {
 		i = 0;
 		encode_block(&i, &x0, &bin[0],  &byte_array[0], block_size);
@@ -392,15 +326,17 @@ int encode(FILE *fp_in, FILE *fp_out, const unsigned int block_size)
 		bitview.f = x0;	
 		if (read_length < block_size) {
 			bitview.c[sizeof_x - 1] = 0x40 + read_length;
+			last_length = read_length;
 		}
 		write_block(fp_out, &bitview.c[0], sizeof_x);
-		
-		block_no++;
+		result->count += i;
+		block_count++;
 	}
 
-	printf("Encode %dblocks(%dbytes).\n",
-	       block_no,
-	       (block_no - 1) * (sizeof_x) + read_length);
+	result->block_size = block_size;
+	result->block_count = block_count;
+	result->read_bytes = (block_count - 1) * block_size + last_length;
+	result->write_bytes = block_count * sizeof_x;
 	
 	return 1;
 }
@@ -415,7 +351,8 @@ int encode(FILE *fp_in, FILE *fp_out, const unsigned int block_size)
  *  1: success
  *  0: fail
  */
-int decode(FILE *fp_in, FILE *fp_out, const unsigned int block_size)
+int lcg_decode(FILE *fp_in, FILE *fp_out, const unsigned int block_size,
+	       struct lcg_operation_result *result)
 {	
 	const int sizeof_x = sizeof(X_FLOAT_TYPE); 
 
@@ -430,7 +367,7 @@ int decode(FILE *fp_in, FILE *fp_out, const unsigned int block_size)
 
 	X_FLOAT_TYPE *x0;
 
-	int block_no = 0;
+	unsigned long int block_count = 0;
 	unsigned int write_block_size = block_size;
 	unsigned int read_length;
 
@@ -452,180 +389,86 @@ int decode(FILE *fp_in, FILE *fp_out, const unsigned int block_size)
 		}
 
 		write_block(fp_out, &byte_array[0], write_block_size);
-		block_no++;
+		block_count++;
 	}
-	/*last block size is write_block_size*/
-	printf("Decode %dblocks(%dbytes).\n", block_no,
-	        	(block_no - 1) * (block_size) + write_block_size);
+
+	result->count = 0;
+	result->block_count = block_count;
+	result->read_bytes = block_count * sizeof_x;
+	result->write_bytes = (block_count - 1) * block_size + write_block_size;
+
+	return 1;
+}
+
+
+/**
+ * lcg_xor() - XOR operation by 1byte.
+ *
+ * @x:		input x char array
+ * @y:		input y char array
+ * @out: 	output char array
+ */
+void lcg_xor(unsigned char *x, unsigned char *y,
+	     unsigned char *out, const unsigned int size)
+{	
+	int i = size;
+	while(i--)
+		*(out + i) = *(x + i) ^ *(y + i);
+}
+
+/**
+ * lcg_split_xor() - split file sub using random.
+ */
+int lcg_split_xor(FILE *fp_in, FILE *fp_out_key, FILE *fp_out_bin)
+{	
+
+	union bitwise64 bitview;
+	unsigned char bin[8];
+	unsigned char xor_out[8];
+	unsigned char random_point = 0x00;
+	int write_block_size;
+
+	lcg_init_seed();
+
+	while((write_block_size = read_block(fp_in, &bin[0], 8)) > 0) {
+		bitview.i = xor64();
+
+		/*random seed change*/
+		if (bitview.c[7] == random_point) {
+			lcg_init_seed();
+			random_point = bitview.c[3] ^ bin[5];
+		}
+
+		lcg_xor(&bin[0], &bitview.c[0], &xor_out[0], write_block_size);
+
+		write_block(fp_out_key, &bitview.c[0], write_block_size);
+		write_block(fp_out_bin, &xor_out[0], write_block_size);
+	}
 
 	return 1;
 }
 
 /**
- * request_fp_open() - Request file open and initilize.
- *
- * @fp:        file pointer
- * @filename:  filename
- * @mode:      mode
- *
- * Print the error message to stderr when the program can not open file.
- * 
- * Returns:
- *  FILE*: success
- *  NULL:  fail
+ * lcg_join_xor() - join file xor key file.
  */
-FILE *request_fp_open(FILE *fp, const char *filename, const char *mode)
-{
-	if ((fp = fopen(filename, mode)) == NULL) {
-		fprintf(stderr, "File open error: %s.\n", filename);
-		return fp;
-	}
-	/*change buffer size*/
-	// setvbuf(fp, NULL, _IOFBF, 512*1024);
-	return fp;
-}
+int lcg_join_xor(FILE *fp_in, FILE *fp_in_key, FILE *fp_out_bin)
+{	
+	unsigned char bin[8];
+	unsigned char key[8];
+	unsigned char out[8];
+	int write_block_size;
 
-/**
- * check_file_type() - Check I/O file type.
- *
- * @sb:		file stat
- *
- * Returns:
- *  1: allow
- *  0: ban
- */
-int check_file_type(struct stat *sb)
-{
-	switch (sb->st_mode & S_IFMT) {
-		case S_IFBLK:		/*block device*/
-			printf("block device\n");
-			return 1;
-		case S_IFCHR:		/*character device*/
-			printf("character device\n");
-			return 1;
-		case S_IFDIR:		/*directory*/
+	while(1) {
+		write_block_size = read_block(fp_in, &bin[0], 8);
+		if (write_block_size != read_block(fp_in_key, &key[0], 8))
 			return 0;
-		case S_IFIFO:		/*FIFO-pipe*/
-			printf("FIFO/pipe\n");
-			return 0;
-		case S_IFLNK:		/*link*/
-			return 0;
-		case S_IFREG:		/*regular file*/
-			return 1;
-		case S_IFSOCK:		/*socket*/
-			return 0;
-		default:		/*unknown*/
-			return 0;
+
+		if (write_block_size < 1)
+			break;
+
+		lcg_xor(&bin[0], &key[0], &out[0], write_block_size);
+		write_block(fp_out_bin, &out[0], write_block_size);
 	}
 
-	return 0;
-}
-
-int main (int argc, char **argv)
-{       
-	FILE *fp_in;
-	FILE *fp_out;
-	struct stat sb_in;
-	struct stat sb_out;
-
-	int opt;
-	int opt_decode = 0;
-	unsigned int block_size = BLOCK_SIZE;
-
-	char *input_filename;
-	char *output_filename;
-
-	initilize_seed();
-
-	while ((opt = getopt(argc, argv, "ds:o:")) != -1) {
-    		switch (opt) {
-    			case 'd':
-    				opt_decode = 1;
-    				break;
-    			case 's':
-    				block_size = atoi(optarg);
-    				if (
-    					block_size == 0
-    					|| block_size > UCHAR_MAX - 0x40
-    				) {
-    					fprintf(stderr,
-    						"Invalid block size.\n");
-    					exit(EXIT_FAILURE);
-    				}
-    				break;
-			default:
-				printf("usage: %s [-v] [-s[BLOCK_SIZE]] \
-				                        input output\n",
-				                        argv[0]);
-				exit(EXIT_FAILURE);
-    		}
-    	}
-
-	if (argc - optind > 2) {
-		fprintf(stderr, "Too many argments\n");
-		exit(EXIT_FAILURE);
-	}
-
-	if (argc - optind == 0 || strcmp(argv[optind], "-") == 0) {
-		fprintf(stderr, "Missing input filename\n");
-		exit(EXIT_FAILURE);
-	}
-
-	if (argc - optind == 1 || strcmp(argv[optind + 1], "-") == 0) {
-		fprintf(stderr,"Missing output filename\n");
-		exit(EXIT_FAILURE);
-	}
-
-	input_filename = argv[optind];
-	output_filename = argv[optind + 1];
-
-	if (stat(input_filename, &sb_in) == -1) {
-		perror("stat");
-		exit(EXIT_FAILURE);
-	}
-
-	if (!check_file_type(&sb_in)) {
-		fprintf(stderr, "input filetype\n");
-		exit(EXIT_FAILURE);
-	}
-
-	if (stat(output_filename, &sb_out) != -1) {
-		if(!check_file_type(&sb_out)) {
-			fprintf(stderr, "output filetype\n");
-			exit(EXIT_FAILURE);
-		}	
-	}
-
-	if (sb_in.st_ino == sb_out.st_ino) {
-		fprintf(stderr, "input = output\n");
-		exit(EXIT_FAILURE);
-	}
-
-
-	printf("File size:                %lld bytes\n", 
-			      (long long) sb_in.st_size);
-
-    	printf("Block size %dbytes.\n", block_size);
-
-	if (opt_decode) {
-		fp_in = request_fp_open(fp_in, input_filename, "rb");
-		fp_out = request_fp_open(fp_out, output_filename, "wb");
-		
-		if (fp_in != NULL && fp_out != NULL)
-			decode(fp_in, fp_out, block_size);
-		
-	} else {
-		fp_in = request_fp_open(fp_in, input_filename, "rb");
-		fp_out = request_fp_open(fp_out, output_filename, "wb");
-
-		if (fp_in != NULL && fp_out != NULL)
-			encode(fp_in, fp_out, block_size);
-	}
-	
-	if (fp_in != NULL)
-		fclose(fp_in);
-	
-	if (fp_out != NULL)
-		fclose(fp_out);
-
+	return 1;
 }
