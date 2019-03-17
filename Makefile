@@ -20,3 +20,6 @@ install:	$(PROGRAM)
 
 uninstall:	
 		rm -f $(DEST)/$(PROGRAM)
+
+clean-asm:
+		rm -f *.s
