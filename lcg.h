@@ -28,7 +28,7 @@
 #endif
 
 struct double_inner {
-	unsigned long int coefficient : 52;
+	unsigned long long int coefficient : 52;
 	unsigned int radix : 11;
 	unsigned int sign : 1;
 };
