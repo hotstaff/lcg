@@ -19,7 +19,7 @@
 
 
 /**
- * request_fp_open() - Request file open and initilize.
+ * fp_init() - Request file open and initilize.
  *
  * @fp:        file pointer
  * @filename:  filename
@@ -31,8 +31,9 @@
  *  FILE*: success
  *  NULL:  fail
  */
-static FILE *request_fp_open(FILE *fp, const char *filename, const char *mode)
+static FILE *fp_init(const char *filename, const char *mode)
 {
+	FILE *fp;
 	if ((fp = fopen(filename, mode)) == NULL) {
 		fprintf(stderr, "File open error: %s.\n", filename);
 		return fp;
@@ -40,6 +41,17 @@ static FILE *request_fp_open(FILE *fp, const char *filename, const char *mode)
 	/*change buffer size*/
 	// setvbuf(fp, NULL, _IOFBF, 512*1024);
 	return fp;
+}
+
+/**
+ * fp_close() - Shorthand function of fclose()
+ *
+ * This function do not exec fclose() when fp has NULL pointer.
+ */
+static void fp_close(FILE *fp)
+{
+	if (fp != NULL)
+		fclose(fp);		
 }
 
 /**
@@ -183,35 +195,27 @@ input output\n", argv[0]);
 			strncpy(xor_tmp_filename, input_filename, 248);
 			strcat(xor_tmp_filename, ".tmp");
 
-			fp_in = request_fp_open(fp_in, input_filename, "rb");
+			fp_in = fp_init(input_filename, "rb");
+			fp_xor_key = fp_init(xor_filename,"rb");
+			fp_xor_bin = fp_init(xor_tmp_filename, "wb");
 
-			fp_xor_key = request_fp_open(fp_xor_key, xor_filename,
-						     			 "rb");
-			fp_xor_bin = request_fp_open(fp_out,
-						     xor_tmp_filename,
-						     "wb");
 			if (fp_in != NULL 
 			    && fp_xor_key != NULL
 			    && fp_xor_bin != NULL) 
 				lcg_join_xor(fp_in, fp_xor_key, fp_xor_bin);
 
-			if (fp_in != NULL)
-				fclose(fp_in);
-			
-			if (fp_xor_key != NULL)
-				fclose(fp_xor_key);
-
-			if (fp_xor_bin != NULL)
-				fclose(fp_xor_bin);
+			fp_close(fp_in);
+			fp_close(fp_xor_key);
+			fp_close(fp_xor_bin);
 		}
 
 		if (opt_xor) {
-			fp_in = request_fp_open(fp_in, xor_tmp_filename, "rb");
+			fp_in = fp_init(xor_tmp_filename, "rb");
 		} else {
-			fp_in = request_fp_open(fp_in, input_filename, "rb");
+			fp_in = fp_init(input_filename, "rb");
 		}
 		
-		fp_out = request_fp_open(fp_out, output_filename, "wb");
+		fp_out = fp_init(output_filename, "wb");
 		
 		if (fp_in != NULL && fp_out != NULL) {
 			lcg_decode(fp_in, fp_out, block_size, result);
@@ -221,18 +225,15 @@ input output\n", argv[0]);
 	        		result->write_bytes);
 		}
 
-		if (fp_in != NULL)
-			fclose(fp_in);
-		
-		if (fp_out != NULL)
-			fclose(fp_out);
+		fp_close(fp_in);
+		fp_close(fp_out);
 
 		if (opt_xor)
 			remove(xor_tmp_filename);
 
 	} else {
-		fp_in = request_fp_open(fp_in, input_filename, "rb");
-		fp_out = request_fp_open(fp_out, output_filename, "wb");
+		fp_in = fp_init(input_filename, "rb");
+		fp_out = fp_init(output_filename, "wb");
 
 		if (fp_in != NULL && fp_out != NULL) {
 			lcg_encode(fp_in, fp_out, block_size, result);
@@ -243,11 +244,8 @@ input output\n", argv[0]);
 	        		result->write_bytes);
 		}
 
-		if (fp_in != NULL)
-			fclose(fp_in);
-		
-		if (fp_out != NULL)
-			fclose(fp_out);
+		fp_close(fp_in);
+		fp_close(fp_out);
 
 		if(opt_xor) {
 			/*rename and in*/
@@ -256,26 +254,17 @@ input output\n", argv[0]);
 			if (rename(output_filename, xor_tmp_filename) != 0)
 				exit(EXIT_FAILURE);
 
-			fp_in = request_fp_open(fp_in, xor_tmp_filename, "rb");
-
-			fp_xor_key = request_fp_open(fp_xor_key, xor_filename,
-						     			 "wb");
-			fp_xor_bin = request_fp_open(fp_xor_bin,
-						     output_filename,
-						     "wb");
+			fp_in = fp_init(xor_tmp_filename, "rb");
+			fp_xor_key = fp_init(xor_filename, "wb");
+			fp_xor_bin = fp_init(output_filename, "wb");
 			if (fp_in != NULL 
 			    && fp_xor_key != NULL
 			    && fp_xor_bin != NULL) 
 				lcg_split_xor(fp_in, fp_xor_key, fp_xor_bin);
 
-			if (fp_in != NULL)
-				fclose(fp_in);
-			
-			if (fp_xor_key != NULL)
-				fclose(fp_xor_key);
-
-			if (fp_xor_bin != NULL)
-				fclose(fp_xor_bin);
+			fp_close(fp_in);
+			fp_close(fp_xor_key);
+			fp_close(fp_xor_bin);
 
 			remove(xor_tmp_filename);
 		}

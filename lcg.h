@@ -65,15 +65,15 @@ union bitwise32 {
 struct lcg_operation_result {
 	unsigned long long int count;		/*total retry count*/
 	unsigned long int block_count;		/*block count*/
-	unsigned long int block_size;		/*block size*/
+	size_t block_size;			/*block size*/
 	unsigned long int write_bytes;		/*write_bytes*/
 	unsigned long int read_bytes;		/*read_bytes*/
 };
 
 extern void lcg_init_seed(void);
-extern int lcg_encode(FILE *fp_in, FILE *fp_out, const unsigned int block_size,
+extern int lcg_encode(FILE *fp_in, FILE *fp_out, const size_t block_size,
 		      struct lcg_operation_result *result);
-extern int lcg_decode(FILE *fp_in, FILE *fp_out, const unsigned int block_size,
+extern int lcg_decode(FILE *fp_in, FILE *fp_out, const size_t block_size,
 	       	      struct lcg_operation_result *result);
 extern int lcg_split_xor(FILE *fp_in, FILE *fp_out_key, FILE *fp_out_bin);
 extern int lcg_join_xor(FILE *fp_in, FILE *fp_in_key, FILE *fp_out_bin);
