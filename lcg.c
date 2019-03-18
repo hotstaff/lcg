@@ -2,8 +2,8 @@
 /*  
  *  lcg.c - Logistic Chaos bit Generator
  *
- *  This program encode the binary data to its logistic map
- *  origin with initial value x0.
+ *  This program encodes binary data into logistic map
+ *  starting from the initial value x0.
  *
  *  Copyright 2019 Hideto Manjo.
  *  Written by:  Hideto Manjo <enjinit@gmail.com>

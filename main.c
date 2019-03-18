@@ -2,8 +2,8 @@
 /*  
  *  lcg.c - Logistic Chaos bit Generator sample program
  *
- *  This program encode the binary data to its logistic map
- *  origin with initial value x0.
+ *  This program encodes binary data into logistic map
+ *  starting from the initial value x0.
  *
  *  Copyright 2019 Hideto Manjo.
  *  Written by:  Hideto Manjo <enjinit@gmail.com>
@@ -15,8 +15,54 @@
 #include <string.h>
 #include <getopt.h>
 #include <limits.h>
+#include <time.h>
 #include "lcg.h"
 
+/**
+ * shred() - Overwrites with random data and removes.
+ * @filename  	filename
+ *
+ * Returns:
+ *  1: success
+ *  0: fail
+ */
+static int shred(char *filename)
+{
+	FILE *fp;
+	size_t i = 0;
+	unsigned long int r;
+	struct stat sb;
+
+	srandom(time(NULL));
+
+	if (stat(filename, &sb) == -1)
+		return 0;
+
+	fp = fopen(filename, "wb");
+	if (fp == NULL)
+		return 0;
+
+	i = sb.st_size / sizeof(unsigned long int);
+	while (i--) {
+		r = random();
+		if (!fwrite(&r, sizeof(unsigned long int), 1, fp))
+			return 0;
+	}
+
+	i = sb.st_size % sizeof(unsigned long int);
+	if (i) {
+		r = random();
+		if (!fwrite(&r, 1, i, fp))
+			return 0;
+	}
+	
+	fclose(fp);
+
+	if (remove(filename) != 0)
+		return 0;
+
+	return 1;
+}
 
 /**
  * fp_init() - Request file open and initilize.
@@ -99,12 +145,13 @@ int main (int argc, char **argv)
 	/*for xor in/out*/
 	FILE *fp_xor_key;
 	FILE *fp_xor_bin;
+
 	struct stat sb_in;
 	struct stat sb_out;
-
 	struct lcg_operation_result res = {0};
 	struct lcg_operation_result *result = &res; 
 
+	/*option*/
 	int opt;
 	int opt_decode = 0;
 	unsigned int block_size = BLOCK_SIZE;
@@ -190,7 +237,7 @@ input output\n", argv[0]);
 
 	if (opt_decode) {
 
-		if(opt_xor) {
+		if (opt_xor) {
 			/*rename and in*/
 			strncpy(xor_tmp_filename, input_filename, 248);
 			strcat(xor_tmp_filename, ".tmp");
@@ -227,9 +274,9 @@ input output\n", argv[0]);
 
 		fp_close(fp_in);
 		fp_close(fp_out);
-
-		if (opt_xor)
-			remove(xor_tmp_filename);
+		if (opt_xor) {
+			shred(xor_tmp_filename);
+		}
 
 	} else {
 		fp_in = fp_init(input_filename, "rb");
@@ -247,7 +294,7 @@ input output\n", argv[0]);
 		fp_close(fp_in);
 		fp_close(fp_out);
 
-		if(opt_xor) {
+		if (opt_xor) {
 			/*rename and in*/
 			strncpy(xor_tmp_filename, output_filename, 248);
 			strcat(xor_tmp_filename, ".tmp");
@@ -266,11 +313,11 @@ input output\n", argv[0]);
 			fp_close(fp_xor_key);
 			fp_close(fp_xor_bin);
 
-			remove(xor_tmp_filename);
+			shred(xor_tmp_filename);
 		}
 
 		
 	}
 
-	
+	return 1;
 }

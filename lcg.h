@@ -27,26 +27,13 @@
 #define BITWISE            bitwise32
 #endif
 
-struct double_inner {
-	unsigned long long int coefficient : 52;
-	unsigned int radix : 11;
-	unsigned int sign : 1;
-};
-
-struct float_inner {
-	unsigned int coefficient : 23;
-	unsigned int radix : 8;
-	unsigned int sign : 1;
-};
-
 /**
  * union bitwise64 - View of 64bit float point number
  */
 union bitwise64 {
 	double f;
 	long long int i;
-	unsigned char c[8];
-	struct double_inner inner;		
+	unsigned char c[8];	
 };
 
 /**
@@ -56,7 +43,6 @@ union bitwise32 {
 	float f;
 	long int i;
 	unsigned char c[4];
-	struct float_inner inner;
 };
 
 /**
