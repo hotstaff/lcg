@@ -1,5 +1,5 @@
 CC            = gcc
-CFLAGS        = -O2 -Wall -I/usr/local/include
+CFLAGS        = -O2 -march=native -Wall -I/usr/local/include
 DEST          = /usr/local/bin
 LDFLAGS       = -L/usr/local/lib
 LIBS          = -lm
