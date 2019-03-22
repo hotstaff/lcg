@@ -5,7 +5,8 @@ Implementation example of embedding original data into unestimateable random dat
 # Description
 
 This program focuses on the randomness of chaotic maps and applies the a = 4 logistic map to bit string generation and data hiding.
-*** Please read README_verbose.md for more details. ***
+
+__Please read README\_verbose.md for more details.__
 
 ## Decode
 
