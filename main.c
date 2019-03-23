@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 /*  
- *  lcg.c - Logistic Chaos bit Generator sample program
+ *  main.c - Logistic Chaos bit Generator sample program
  *
  *  This program encodes binary data into logistic map
  *  starting from the initial value x0.

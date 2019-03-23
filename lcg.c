@@ -296,7 +296,7 @@ static int encode_block(unsigned long long int *counter, X_FLOAT_TYPE *x0,
 }
 
 /**
- * encode() - Read binary file and encode it.
+ * lcg_encode() - Read binary file and encode it.
  * @fp_in:   read file.
  * @fp_out:  out file.
  *
@@ -350,7 +350,7 @@ int lcg_encode(FILE *fp_in, FILE *fp_out, const size_t block_size,
 }
 
 /**
- * decode() - Read binary file and decode it.
+ * lcg_decode() - Read binary file and decode it.
  *
  * @fp_in:   readfile
  * @fp_out:  outfile 

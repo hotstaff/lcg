@@ -1,4 +1,4 @@
-# Logistic Chaos bit string Generator (LCG)
+# Logistic Chaos bit Generator (LCG)
 
 Implementation example of embedding original data into unestimateable random data set.
 
@@ -81,13 +81,3 @@ This operation converts the original data into a seemingly random set of data. T
 This method is fundamental to cryptography but is a very effective key generation method. But it's a huge key.
 Even with the shortcomings of pseudorandom number generators, the sensitivity of the underlying chaotic map makes estimating the underlying data more difficult.
 In summary, it is almost impossible to estimate the original data by hiding the chaotic map with random data.
-
-# Build
-```
-make
-```
-
-# Install
-```
-sudo make install
-```
