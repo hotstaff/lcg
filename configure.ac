@@ -7,6 +7,9 @@ AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
+# Debug option: -g disable.
+: ${CFLAGS="-O2"} 
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
