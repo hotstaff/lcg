@@ -6,7 +6,7 @@ Implementation example of embedding original data into unestimateable random dat
 
 This program focuses on the randomness of chaotic maps and applies the a = 4 logistic map to bit string generation and data hiding.
 
-__Please read README\_verbose.md for more details.__
+__Please read doc/README\_verbose.md for more details.__
 
 ## Decode
 
@@ -20,9 +20,11 @@ It takes time because the bit string can only be calculated from the initial val
 
 By hiding the bit string in the chaos map and performing random XOR operation, the original data can not be estimated.
 
-# Build
+# To Build
 
 ```
+./autogen.sh
+./congigure
 make
 ```
 
