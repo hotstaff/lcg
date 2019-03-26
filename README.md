@@ -35,6 +35,13 @@ make
 sudo make install
 ```
 
+## Clean
+
+```
+git clean -d -f
+```
+The state of the directory is restored before running ./autogen.sh.
+
 ## Usage
 
 ### Encode
