@@ -2,11 +2,11 @@
 
 Implementation example of embedding original data into unestimateable random data set.
 
-# Description
+# Overview
 
 This program focuses on the randomness of chaotic maps and applies the a = 4 logistic map to bit string generation and data hiding.
 
-__Please read doc/README\_verbose.md for more details.__
+Please read __doc/README\_verbose.md__ for more details.
 
 ## Decode
 
@@ -16,9 +16,10 @@ It's very fast.
 
 It takes time because the bit string can only be calculated from the initial value x0 round robin.
 
-## Effect
+## Benefit
 
 By hiding the bit string in the chaos map and performing random XOR operation, the original data can not be estimated.
+
 
 # To Build
 
@@ -39,20 +40,20 @@ sudo make install
 ## Encode
 
 ```
-./lcg input.bin output.bin -s 2
+lcg input.bin output.bin -s 2
 ```
 -s 2 option means the block size 2bytes(16bits).
 
 ## Decode
 
 ```
-./lcg -d input.bin output.bin -s 2
+lcg -d input.bin output.bin -s 2
 ```
 
 ## Encode and create decrypt key
 
 ```
-./lcg input.bin output.bin -s 2 -k decrypt.key
+lcg input.bin output.bin -s 2 -k decrypt.key
 ```
 
 The program create decrypt.key.
@@ -64,7 +65,7 @@ It is not encryption, an XOR with just random data.
 ## Decode with decrypt key
 
 ```
-./lcg -d input.bin output.bin -s 2 -k decrypt.key
+lcg -d input.bin output.bin -s 2 -k decrypt.key
 ```
 
 # Licence
