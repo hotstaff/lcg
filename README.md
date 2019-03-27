@@ -25,7 +25,7 @@ By hiding the bit string in the chaos map and performing random XOR operation, t
 
 ```
 ./autogen.sh
-./congigure
+./configure
 make
 ```
 
