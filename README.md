@@ -1,4 +1,4 @@
-# Logistic Chaos bit Generator (LCG)
+# Logistic Chaos bit Generator (LCG) [![Build Status](https://travis-ci.org/hotstaff/lcg.svg?branch=master)](https://travis-ci.org/hotstaff/lcg)
 
 Implementation example of embedding original data into unestimateable random data set.
 

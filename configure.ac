@@ -8,7 +8,7 @@ AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
 # Debug option: -g disable.
-: ${CFLAGS="-O2"} 
+: ${CFLAGS="-std=gnu11 -O2"} 
 
 # Checks for programs.
 AC_PROG_CC
