@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <sys/time.h>
 #include <limits.h>
 #include "lcg.h"
 
@@ -90,19 +90,16 @@ static void cp_bytes(unsigned char* array1, unsigned char* array2,
 /**
  * lcg_init_seed() - Initilize seed of xor64(). 
  *
- * If timespec_get failed, this function terminate process for safety.
- *
  */
 void lcg_init_seed(void)
 {	
-	struct timespec ts;
+	struct timeval now;
 
-	if (timespec_get(&ts, TIME_UTC) == 0) {
+	if (gettimeofday(&now, NULL) == -1) {
  		fprintf(stderr, "Seed initilize failure. Forced termination.\n");
  		exit(EXIT_FAILURE);
  	}
-
-	srandom(ts.tv_nsec ^ ts.tv_sec);
+	srandom(now.tv_usec ^ now.tv_sec);
 	lcg_seed ^= (unsigned long long int) random();
 	lcg_seed = lcg_seed << 32;
 	lcg_seed ^= (unsigned long long int) random();
