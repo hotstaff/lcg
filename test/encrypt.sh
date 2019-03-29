@@ -13,8 +13,8 @@ rm $OUTPUT
 rm $INPUT_R
 rm $KEY
 
-../src/lcg $INPUT $OUTPUT -k $KEY &> /dev/null
-../src/lcg -d $OUTPUT $INPUT_R -k $KEY &> /dev/null
+../src/lcg $INPUT $OUTPUT -k $KEY
+../src/lcg -d $OUTPUT $INPUT_R -k $KEY
 
 cmp -lb $INPUT $INPUT_R
 if [ "$?" -eq 0 ]; then

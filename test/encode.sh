@@ -10,8 +10,8 @@ INPUT_R=$SCRIPT_DIR/sample_r.bin
 
 rm OUTPUT
 rm INPUT_R
-../src/lcg $INPUT $OUTPUT &> /dev/null
-../src/lcg -d $OUTPUT $INPUT_R &> /dev/null
+../src/lcg $INPUT $OUTPUT
+../src/lcg -d $OUTPUT $INPUT_R
 
 cmp -lb $INPUT $INPUT_R
 if [ "$?" -eq 0 ]; then
