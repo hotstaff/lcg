@@ -3,10 +3,11 @@
 echo "---ENCODE/DECODE TEST---"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
+TMPDIR=$(mktemp -d)
 
 INPUT=$SCRIPT_DIR/sample.bin
-OUTPUT=$SCRIPT_DIR/output.bin
-INPUT_R=$SCRIPT_DIR/sample_r.bin
+OUTPUT=$TMPDIR/output.bin
+INPUT_R=$TMPDIR/sample_r.bin
 
 rm $OUTPUT
 rm $INPUT_R
@@ -14,7 +15,11 @@ rm $INPUT_R
 ../src/lcg -d $OUTPUT $INPUT_R
 
 cmp -lb $INPUT $INPUT_R
-if [ "$?" -eq 0 ]; then
+RESULT=$?
+
+rmdir $TMPDIR --ignore-fail-on-non-empty
+
+if [ $RESULT -eq 0 ]; then
 	echo "Test success."
 	exit 0
 fi
