@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <getopt.h>
+#include <unistd.h>
 #include <limits.h>
 #include <time.h>
 #include "lcg.h"
@@ -163,26 +163,28 @@ int main (int argc, char **argv)
 
 	while ((opt = getopt(argc, argv, "ds:k:")) != -1) {
 		switch (opt) {
-			case 'd':
-				opt_decode = 1;
-				break;
-			case 's':
-				block_size = atoi(optarg);
-				if (
-					block_size == 0
-					|| block_size > UCHAR_MAX - 0x40
-				) {
-					fprintf(stderr,
-						"Invalid block size.\n");
-					exit(EXIT_FAILURE);
-				}
-				break;
-			case 'k':
-				opt_xor = 1;
-				xor_filename = optarg;
-				break;
-			default:
-				printf("usage: %s [-d] [-k] [-s[BLOCK_SIZE]] \
+		case 'd':
+			opt_decode = 1;
+			break;
+		case 's':
+			block_size = atoi(optarg);
+			if (
+				block_size == 0
+				|| block_size > UCHAR_MAX - 0x40
+			) {
+				fprintf(stderr,
+					"Invalid block size.\n");
+				exit(EXIT_FAILURE);
+			}
+			break;
+		case 'k':
+			opt_xor = 1;
+			xor_filename = optarg;
+			break;
+		case ':':
+			break;
+		default:
+			printf("usage: %s [-d] [-k] [-s[BLOCK_SIZE]] \
 input output\n", argv[0]);
 				exit(EXIT_FAILURE);
 		}

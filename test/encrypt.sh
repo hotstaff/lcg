@@ -1,5 +1,4 @@
 #!/bin/bash
-
 echo "---ENCRYPT/DECRYPT TEST---"
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
@@ -10,17 +9,13 @@ OUTPUT=$TMPDIR/output_encrypted.bin
 INPUT_R=$TMPDIR/sample_decrypted.bin
 KEY=$TMPDIR/output_encrypted.key
 
-rm $OUTPUT
-rm $INPUT_R
-rm $KEY
-
-../src/lcg $INPUT $OUTPUT -k $KEY
-../src/lcg -d $OUTPUT $INPUT_R -k $KEY
+../src/lcg -k $KEY $INPUT $OUTPUT
+../src/lcg -d -k $KEY $OUTPUT $INPUT_R
 
 cmp -lb $INPUT $INPUT_R
 RESULT=$?
 
-rmdir $TMPDIR --ignore-fail-on-non-empty
+rmdir --ignore-fail-on-non-empty $TMPDIR 
 
 if [ $RESULT -eq 0 ]; then
 	echo "Test success."
