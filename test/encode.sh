@@ -8,8 +8,8 @@ INPUT=$SCRIPT_DIR/sample.bin
 OUTPUT=$SCRIPT_DIR/output.bin
 INPUT_R=$SCRIPT_DIR/sample_r.bin
 
-rm OUTPUT
-rm INPUT_R
+rm $OUTPUT
+rm $INPUT_R
 ../src/lcg $INPUT $OUTPUT
 ../src/lcg -d $OUTPUT $INPUT_R
 
