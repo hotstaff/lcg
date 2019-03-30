@@ -1,0 +1,37 @@
+.TH LCG 1
+.SH NAME
+lcg \- a program for embedding arbitrary data into a data set that looks random
+.SH SYNOPSIS
+\fBlcg\fR [\fI-s\fR][\fI-k [KEY]\fR] input output\fR
+.br
+.de FL
+.TP
+\\fB\\$1\\fR
+\\$2
+..
+.de EX
+.TP 20
+\\fB\\$1\\fR
+# \\$2
+..
+.SH EXAMPLES
+.P
+\fBlcg input output\fP               Encode binary data
+.P
+\fBlcg -d input output\fP            Decode binary data
+.P
+\fBlcg -k key input output\fP        Encrypt binary data
+.P
+\fBlcg -d -k key input output\fP     Decrypt binary data
+.SH DESCRIPTION
+.PP
+.I Lcg
+uses logistic mapping for bit string generation and data hiding.
+.SH AUTHOR
+.I Lcg
+is written by Hideto Manjo.
+.SH COPYLIGHT
+Copyright (C) 2019  Hideto Manjo.
+.br
+.I Lcg
+is released under the terms of the MIT license.

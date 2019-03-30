@@ -1,1 +1,3 @@
 SUBDIRS = src
+man_MANS = man/lcg.1
+EXTRA_DIST = README.md COPYING AUTHORS $(man_MANS)
