@@ -77,4 +77,4 @@ lcg -d input.bin output.bin -s 2 -k decrypt.key
 
 ## Licence
 
-lcg is released under the terms of the MIT license. See COPYING for more information or see https://opensource.org/licenses/MIT.
+Lcg is released under the terms of the MIT license. See COPYING for more information or see https://opensource.org/licenses/MIT.
