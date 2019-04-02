@@ -327,12 +327,20 @@ int lcg_encode(FILE *fp_in, FILE *fp_out, const size_t block_size,
 
 		i = 0;
 		encode_block(&i, &x0, &bin[0],  &byte_array[0], block_size);
-	
-		bitview.f = x0;	
+		bitview.f = x0;
+
 		if (read_length < block_size) {
+			/*the end of last block must be 0x3F.*/
+			while (bitview.c[sizeof_x - 1] != 0x3F) {
+				encode_block(&i, &x0,  &bin[0], &byte_array[0],
+								    block_size);
+				bitview.f = x0;
+			}
 			bitview.c[sizeof_x - 1] = 0x40 + read_length;
 			last_length = read_length;
 		}
+
+		
 		write_block(fp_out, &bitview.c[0], sizeof_x);
 		result->count += i;
 		block_count++;
