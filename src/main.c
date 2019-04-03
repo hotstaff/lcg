@@ -111,25 +111,25 @@ static void fp_close(FILE *fp)
 static int check_file_type(struct stat *sb)
 {
 	switch (sb->st_mode & S_IFMT) {
-		case S_IFBLK:		/*block device*/
-			printf("block device\n");
-			return 1;
-		case S_IFCHR:		/*character device*/
-			printf("character device\n");
-			return 1;
-		case S_IFDIR:		/*directory*/
-			return 0;
-		case S_IFIFO:		/*FIFO-pipe*/
-			printf("FIFO/pipe\n");
-			return 0;
-		case S_IFLNK:		/*link*/
-			return 0;
-		case S_IFREG:		/*regular file*/
-			return 1;
-		case S_IFSOCK:		/*socket*/
-			return 0;
-		default:		/*unknown*/
-			return 0;
+	case S_IFBLK:		/*block device */
+		printf("block device\n");
+		return 1;
+	case S_IFCHR:		/*character device */
+		printf("character device\n");
+		return 1;
+	case S_IFDIR:		/*directory */
+		return 0;
+	case S_IFIFO:		/*FIFO-pipe */
+		printf("FIFO/pipe\n");
+		return 0;
+	case S_IFLNK:		/*link */
+		return 0;
+	case S_IFREG:		/*regular file */
+		return 1;
+	case S_IFSOCK:		/*socket */
+		return 0;
+	default:		/*unknown */
+		return 0;
 	}
 
 	return 0;
@@ -141,7 +141,7 @@ int main (int argc, char **argv)
 	FILE *fp_in;
 	FILE *fp_out;
 
-	/*for xor in/out*/
+	/*for xor in/out */
 	FILE *fp_xor_key;
 	FILE *fp_xor_bin;
 
@@ -150,7 +150,7 @@ int main (int argc, char **argv)
 	struct lcg_operation_result res = {0};
 	struct lcg_operation_result *result = &res; 
 
-	/*option*/
+	/*option */
 	int opt;
 	int opt_decode = 0;
 	unsigned int block_size = BLOCK_SIZE;
@@ -168,12 +168,8 @@ int main (int argc, char **argv)
 			break;
 		case 's':
 			block_size = atoi(optarg);
-			if (
-				block_size == 0
-				|| block_size > UCHAR_MAX - 0x40
-			) {
-				fprintf(stderr,
-					"Invalid block size.\n");
+			if (block_size == 0 || block_size > UCHAR_MAX - 0x40) {
+				fprintf(stderr, "Invalid block size.\n");
 				exit(EXIT_FAILURE);
 			}
 			break;
