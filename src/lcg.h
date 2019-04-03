@@ -32,7 +32,7 @@
  */
 union bitwise64 {
 	double f;
-	long long int i;
+	unsigned long long int i;
 	unsigned char c[8];
 };
 
@@ -41,7 +41,7 @@ union bitwise64 {
  */
 union bitwise32 {
 	float f;
-	long int i;
+	unsigned long int i;
 	unsigned char c[4];
 };
 
