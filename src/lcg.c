@@ -9,10 +9,9 @@
  *  Written by:  Hideto Manjo <enjinit@gmail.com>
  * 
 */
-
+#include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <limits.h>
 #include "lcg.h"
 
