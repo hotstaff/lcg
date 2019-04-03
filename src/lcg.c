@@ -19,7 +19,6 @@
 /*random seed default*/
 static unsigned long long int lcg_seed = 88172645463325252LL;
 
-
 /**
  * dump_bin() - Print bin and hex.
  *
@@ -27,23 +26,22 @@ static unsigned long long int lcg_seed = 88172645463325252LL;
  * @byte_array:  char array
  * @size:        the length of print
  */
-static void dump_bin(char* title, unsigned char* byte_array,
-	      const size_t size) __attribute__((unused));
-static void dump_bin(char* title, unsigned char* byte_array,
-	      const size_t size) 
+static void dump_bin(char *title, unsigned char *byte_array,
+		     const size_t size) __attribute__ ((unused));
+static void dump_bin(char *title, unsigned char *byte_array, const size_t size)
 {
 	size_t i;
 
 	printf("%8s bin: ", title);
-	
-	for (i = 0; i < size; i++) 
+
+	for (i = 0; i < size; i++)
 		printf("%08d ", BCD(byte_array[i]));
 
 	printf("\n%8s hex: ", title);
-	
+
 	for (i = 0; i < size; i++)
-		printf("0x%02X ", byte_array[i] & 0x000000FF);	
-	
+		printf("0x%02X ", byte_array[i] & 0x000000FF);
+
 	printf("\n");
 }
 
@@ -54,10 +52,10 @@ static void dump_bin(char* title, unsigned char* byte_array,
  * @array2:  char array
  * @size:    the length of compare
  */
-static int cmp_bytes(unsigned char* array1, unsigned char* array2,
-	      const size_t size) __attribute__((unused));
-static int cmp_bytes(unsigned char* array1, unsigned char* array2,
-	      const size_t size)
+static int cmp_bytes(unsigned char *array1, unsigned char *array2,
+		     const size_t size) __attribute__ ((unused));
+static int cmp_bytes(unsigned char *array1, unsigned char *array2,
+		     const size_t size)
 {
 	size_t i;
 
@@ -75,10 +73,10 @@ static int cmp_bytes(unsigned char* array1, unsigned char* array2,
  * @array2:   target array
  * @size:     copy length
  */
-static void cp_bytes(unsigned char* array1, unsigned char* array2,
-	   	     const size_t size) __attribute__((unused));
-static void cp_bytes(unsigned char* array1, unsigned char* array2,
-	   	     const size_t size)
+static void cp_bytes(unsigned char *array1, unsigned char *array2,
+		     const size_t size) __attribute__ ((unused));
+static void cp_bytes(unsigned char *array1, unsigned char *array2,
+		     const size_t size)
 {
 	size_t i;
 
@@ -86,27 +84,28 @@ static void cp_bytes(unsigned char* array1, unsigned char* array2,
 		*(array2 + i) = *(array1 + i);
 }
 
-
 /**
  * lcg_init_seed() - Initilize seed of xor64(). 
  *
  */
 void lcg_init_seed(void)
-{	
+{
 	struct timeval now;
 
 	if (gettimeofday(&now, NULL) == -1) {
- 		fprintf(stderr, "Seed initilize failure. Forced termination.\n");
- 		exit(EXIT_FAILURE);
- 	}
+		fprintf(stderr,
+			"Seed initilize failure. Forced termination.\n");
+		exit(EXIT_FAILURE);
+	}
 	srandom(now.tv_usec ^ now.tv_sec);
-	lcg_seed ^= (unsigned long long int) random();
+	lcg_seed ^= (unsigned long long int)random();
 	lcg_seed = lcg_seed << 32;
-	lcg_seed ^= (unsigned long long int) random();
+	lcg_seed ^= (unsigned long long int)random();
 
 	if (lcg_seed == 0)
 		lcg_init_seed();
 }
+
 /**
  * xor64() - Create 64bit pseudorandom numbers using xorshift method
  * 
@@ -126,17 +125,17 @@ static unsigned long long xor64(void)
  * uniform_rand() - Generate a uniform random number normalized from 0 to 1.
  */
 static X_FLOAT_TYPE uniform_rand(void)
-{	
+{
 	static const X_FLOAT_TYPE coefficient = (1.0 / (ULLONG_MAX + 2.0));
 
-	return  coefficient * ((X_FLOAT_TYPE) xor64() + 1.0);
+	return coefficient * ((X_FLOAT_TYPE) xor64() + 1.0);
 }
 
 /**
  * logistic() - Return logistic map.
  */
-static X_FLOAT_TYPE logistic(const X_FLOAT_TYPE *x)
-{       
+static X_FLOAT_TYPE logistic(const X_FLOAT_TYPE * x)
+{
 	return AI * (*x) * (1 - (*x));
 }
 
@@ -146,7 +145,7 @@ static X_FLOAT_TYPE logistic(const X_FLOAT_TYPE *x)
  * This function return unsigned char(0 or 1).
  * 
  */
-static unsigned char degitize(const X_FLOAT_TYPE *x)
+static unsigned char degitize(const X_FLOAT_TYPE * x)
 {
 	if (*x > 0.5)
 		return 1;
@@ -162,9 +161,9 @@ static unsigned char degitize(const X_FLOAT_TYPE *x)
  * This function uses digitize().
  *
  */
-static void eight_bit(X_FLOAT_TYPE *x0, unsigned char *byte_array)
+static void eight_bit(X_FLOAT_TYPE * x0, unsigned char *byte_array)
 {
-	int i = CHAR_BIT; /*1byte = 8bit*/
+	int i = CHAR_BIT;	/*1byte = 8bit */
 
 	while (i--) {
 		*x0 = logistic(x0);
@@ -186,7 +185,7 @@ static void eight_bit(X_FLOAT_TYPE *x0, unsigned char *byte_array)
  *  1: success
  *  0: fail
  */
-static int eight_bit_r(X_FLOAT_TYPE *x0, unsigned char *byte_array,
+static int eight_bit_r(X_FLOAT_TYPE * x0, unsigned char *byte_array,
 		       const unsigned char *target_bin)
 {
 	int i = CHAR_BIT;
@@ -197,14 +196,14 @@ static int eight_bit_r(X_FLOAT_TYPE *x0, unsigned char *byte_array,
 	while (i--) {
 		x = logistic(&x);
 		d = degitize(&x);
-		
+
 		if (d != ((*target_bin >> i) & 1))
 			return 0;
 		*byte_array = *byte_array << 1;
 		*byte_array = *byte_array | d;
 	}
 
-	*x0 = x;	
+	*x0 = x;
 	return 1;
 }
 
@@ -218,8 +217,8 @@ static int eight_bit_r(X_FLOAT_TYPE *x0, unsigned char *byte_array,
  *  >=1: success(read size)
  *    0: fail
  */
-static size_t read_block(FILE *fp, unsigned char* bin, const size_t size)
-{	
+static size_t read_block(FILE * fp, unsigned char *bin, const size_t size)
+{
 	return fread(bin, 1, size, fp);
 }
 
@@ -233,8 +232,8 @@ static size_t read_block(FILE *fp, unsigned char* bin, const size_t size)
  *  >=1: success(wrote size)
  *  0:  fail
  */
-static size_t write_block(FILE *fp, unsigned char* bin, const size_t size)
-{	
+static size_t write_block(FILE * fp, unsigned char *bin, const size_t size)
+{
 	return fwrite(bin, 1, size, fp);
 }
 
@@ -251,7 +250,7 @@ static size_t write_block(FILE *fp, unsigned char* bin, const size_t size)
  *  1: success
  *  0: yet 
 */
-static int encode_block(unsigned long long int *counter, X_FLOAT_TYPE *x0,
+static int encode_block(unsigned long long int *counter, X_FLOAT_TYPE * x0,
 			unsigned char *bin, unsigned char *byte_array,
 			const size_t size)
 {
@@ -260,12 +259,12 @@ static int encode_block(unsigned long long int *counter, X_FLOAT_TYPE *x0,
 	size_t max_j = 0;;
 	X_FLOAT_TYPE x;
 
-	/*x0*/
+	/*x0 */
 	*x0 = uniform_rand();
 	x = *x0;
 
 	while (1) {
-		
+
 		*counter = *counter + 1;
 
 		if (!eight_bit_r(&x, &byte_array[j], &bin[j])) {
@@ -279,14 +278,14 @@ static int encode_block(unsigned long long int *counter, X_FLOAT_TYPE *x0,
 			max_j = j;
 
 		if (*counter % 1000 == 0) {
-			printf("\rtry %19llu bytes, match: %4zu", 
+			printf("\rtry %19llu bytes, match: %4zu",
 			       *counter, max_j + 1);
 			lcg_init_seed();
 		}
 
-		if (++j == size) {	
-			printf("\rhit %19llu bytes, match: %4zu\n", 
-			       *counter, max_j + 1);	
+		if (++j == size) {
+			printf("\rhit %19llu bytes, match: %4zu\n",
+			       *counter, max_j + 1);
 			return 1;
 		}
 	}
@@ -301,16 +300,16 @@ static int encode_block(unsigned long long int *counter, X_FLOAT_TYPE *x0,
  *  1: success
  *  0: yet
  */
-int lcg_encode(FILE *fp_in, FILE *fp_out, const size_t block_size,
+int lcg_encode(FILE * fp_in, FILE * fp_out, const size_t block_size,
 	       struct lcg_operation_result *result)
-{	
+{
 	const size_t sizeof_x = sizeof(X_FLOAT_TYPE);
 
-	/*target binary*/
+	/*target binary */
 	unsigned char bin[block_size];
-	/*generated binary*/                 
+	/*generated binary */
 	unsigned char byte_array[block_size];
-	/*union for X_FLOAT_TYPE to char*/
+	/*union for X_FLOAT_TYPE to char */
 	union BITWISE bitview;
 
 	X_FLOAT_TYPE x0;
@@ -320,27 +319,26 @@ int lcg_encode(FILE *fp_in, FILE *fp_out, const size_t block_size,
 
 	size_t read_length;
 	size_t last_length = block_size;
-	
+
 	result->count = 0;
 
-	while((read_length = read_block(fp_in, &bin[0], block_size))) {
+	while ((read_length = read_block(fp_in, &bin[0], block_size))) {
 
 		i = 0;
-		encode_block(&i, &x0, &bin[0],  &byte_array[0], block_size);
+		encode_block(&i, &x0, &bin[0], &byte_array[0], block_size);
 		bitview.f = x0;
 
 		if (read_length < block_size) {
-			/*the end of last block must be 0x3F.*/
+			/*the end of last block must be 0x3F. */
 			while (bitview.c[sizeof_x - 1] != 0x3F) {
-				encode_block(&i, &x0,  &bin[0], &byte_array[0],
-								    block_size);
+				encode_block(&i, &x0, &bin[0], &byte_array[0],
+					     block_size);
 				bitview.f = x0;
 			}
 			bitview.c[sizeof_x - 1] = 0x40 + read_length;
 			last_length = read_length;
 		}
 
-		
 		write_block(fp_out, &bitview.c[0], sizeof_x);
 		result->count += i;
 		block_count++;
@@ -350,7 +348,7 @@ int lcg_encode(FILE *fp_in, FILE *fp_out, const size_t block_size,
 	result->block_count = block_count;
 	result->read_bytes = (block_count - 1) * block_size + last_length;
 	result->write_bytes = block_count * sizeof_x;
-	
+
 	return 1;
 }
 
@@ -364,16 +362,16 @@ int lcg_encode(FILE *fp_in, FILE *fp_out, const size_t block_size,
  *  1: success
  *  0: fail
  */
-int lcg_decode(FILE *fp_in, FILE *fp_out, const size_t block_size,
+int lcg_decode(FILE * fp_in, FILE * fp_out, const size_t block_size,
 	       struct lcg_operation_result *result)
-{	
-	const size_t sizeof_x = sizeof(X_FLOAT_TYPE); 
+{
+	const size_t sizeof_x = sizeof(X_FLOAT_TYPE);
 
-	/*union for X_FLOAT_TYPE to char*/
+	/*union for X_FLOAT_TYPE to char */
 	union BITWISE bitview;
-	/*read binary*/
+	/*read binary */
 	unsigned char bin[sizeof_x];
-	/*generated binary*/
+	/*generated binary */
 	unsigned char byte_array[block_size];
 
 	X_FLOAT_TYPE *x0;
@@ -387,7 +385,7 @@ int lcg_decode(FILE *fp_in, FILE *fp_out, const size_t block_size,
 		if (read_length != sizeof_x)
 			return 0;
 
-		/*If end block, fix block size and add bin 0x3F*/
+		/*If end block, fix block size and add bin 0x3F */
 		if (bin[sizeof_x - 1] > 0x3F) {
 			write_block_size = bin[sizeof_x - 1] - 0x40;
 			bin[sizeof_x - 1] = 0x3F;
@@ -395,7 +393,7 @@ int lcg_decode(FILE *fp_in, FILE *fp_out, const size_t block_size,
 
 		cp_bytes(bin, bitview.c, sizeof_x);
 		x0 = &bitview.f;
-		
+
 		for (j = 0; j < block_size; j++)
 			eight_bit(x0, &byte_array[j]);
 
@@ -411,7 +409,6 @@ int lcg_decode(FILE *fp_in, FILE *fp_out, const size_t block_size,
 	return 1;
 }
 
-
 /**
  * lcg_xor() - XOR operation by 1byte.
  *
@@ -420,8 +417,8 @@ int lcg_decode(FILE *fp_in, FILE *fp_out, const size_t block_size,
  * @out: 	output char array
  */
 void lcg_xor(unsigned char *x, unsigned char *y,
-	         unsigned char *out, const size_t size)
-{	
+	     unsigned char *out, const size_t size)
+{
 	size_t i = size;
 	while (i--)
 		*(out + i) = *(x + i) ^ *(y + i);
@@ -430,8 +427,8 @@ void lcg_xor(unsigned char *x, unsigned char *y,
 /**
  * lcg_split_xor() - split file sub using random.
  */
-int lcg_split_xor(FILE *fp_in, FILE *fp_out_key, FILE *fp_out_bin)
-{	
+int lcg_split_xor(FILE * fp_in, FILE * fp_out_key, FILE * fp_out_bin)
+{
 
 	union bitwise64 bitview;
 	unsigned char bin[8];
@@ -444,7 +441,7 @@ int lcg_split_xor(FILE *fp_in, FILE *fp_out_key, FILE *fp_out_bin)
 	while ((write_block_size = read_block(fp_in, &bin[0], 8)) > 0) {
 		bitview.i = xor64();
 
-		/*random seed change*/
+		/*random seed change */
 		if (bitview.c[7] == random_point) {
 			lcg_init_seed();
 			random_point = bitview.c[3] ^ bin[5];
@@ -462,8 +459,8 @@ int lcg_split_xor(FILE *fp_in, FILE *fp_out_key, FILE *fp_out_bin)
 /**
  * lcg_join_xor() - join file xor key file.
  */
-int lcg_join_xor(FILE *fp_in, FILE *fp_in_key, FILE *fp_out_bin)
-{	
+int lcg_join_xor(FILE * fp_in, FILE * fp_in_key, FILE * fp_out_bin)
+{
 	unsigned char bin[8];
 	unsigned char key[8];
 	unsigned char out[8];
