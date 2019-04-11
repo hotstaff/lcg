@@ -1,8 +1,8 @@
 .TH LCG 1
 .SH NAME
-lcg \- a program for embedding arbitrary data into a data set that looks random
+lcg \- convert data structure by logistic map
 .SH SYNOPSIS
-\fBlcg\fR [\fI-s\fR][\fI-k [KEY]\fR] input output\fR
+\fBlcg\fR [\fI-s\fR][\fI-k KEYFILE\fR] SOURCE DEST\fR
 .br
 .de FL
 .TP
@@ -16,13 +16,13 @@ lcg \- a program for embedding arbitrary data into a data set that looks random
 ..
 .SH EXAMPLES
 .P
-\fBlcg input output\fP               Encode binary data
+\fBlcg input.bin output.bin\fP                   Encode binary file
 .P
-\fBlcg -d input output\fP            Decode binary data
+\fBlcg -d input.bin output.bin\fP                Decode binary file
 .P
-\fBlcg -k key input output\fP        Encrypt binary data
+\fBlcg -k key.bin input.bin output.bin\fP        Encrypt binary file
 .P
-\fBlcg -d -k key input output\fP     Decrypt binary data
+\fBlcg -d -k key.bin input.bin output.bin\fP     Decrypt binary file
 .SH DESCRIPTION
 .PP
 .I Lcg

@@ -1,6 +1,6 @@
-# Logistic Chaos bit Generator (LCG) [![Build Status](https://travis-ci.org/hotstaff/lcg.svg?branch=master)](https://travis-ci.org/hotstaff/lcg)
+# Logistic Chaos-bit Generator (LCG) [![Build Status](https://travis-ci.org/hotstaff/lcg.svg?branch=master)](https://travis-ci.org/hotstaff/lcg)
 
-Implementation example of embedding original data into unestimateable random data set.
+Conversion program of data structure by logistic map.
 
 ## Overview
 
