@@ -6,6 +6,10 @@ Conversion program of data structure by logistic map.
 
 This program focuses on the randomness of chaotic maps and applies the a = 4 logistic map to bit string generation and data hiding.
 
+### Conceptual diagram
+
+![Conceptual diragram](https://raw.github.com/wiki/hotstaff/lcg/lcg.png)
+
 Please read __README-verbose.md__ for more details.
 
 ### Decode
